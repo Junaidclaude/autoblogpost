@@ -59,3 +59,8 @@ wp = requests.post(
 )
 print("WordPress status:", wp.status_code)
 print(wp.text[:500])
+
+if wp.status_code != 201:
+    print("POST FAILED")
+    sys.exit(1)
+print("Draft created:", wp.json().get("link"))
