@@ -51,6 +51,7 @@ text = data["choices"][0]["message"]["content"]
 wp = requests.post(
     f"{SITE}/wp-json/wp/v2/posts",
     auth=(os.environ["WP_USER"].strip(), os.environ["WP_APP_PASS"].strip()),
+    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36"},
     json={"title": "Daily Update: Abdul El-Sayed",
           "content": text.replace("\n", "<br>"),
           "status": "draft"},
