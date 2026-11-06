@@ -1,7 +1,7 @@
 import os, sys, requests, feedparser
 
 SITE = "https://abdulelsayed.wuaze.com"
-MODEL = "llama-3.3-70b-versatile"
+PREFERRED = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
 
 feed = feedparser.parse("https://news.google.com/rss/search?q=Abdul+El-Sayed&hl=en-US")
 items = feed.entries[:5]
@@ -20,6 +20,20 @@ facts. End with a Sources list.
 key = os.environ.get("GROQ_KEY", "").strip()
 print("GROQ_KEY present:", bool(key))
 
+# Ask Groq which models this key can use
+m = requests.get(
+    "https://api.groq.com/openai/v1/models",
+    headers={"Authorization": f"Bearer {key}"},
+    timeout=30,
+).json()
+available = [x["id"] for x in m.get("data", [])]
+print("Available models:", available)
+
+MODEL = next((p for p in PREFERRED if p in available), None)
+if not MODEL:
+    print("None of the preferred models are available. Pick one from the list above.")
+    sys.exit(1)
+print("Using model:", MODEL)
 r = requests.post(
     "https://api.groq.com/openai/v1/chat/completions",
     headers={"Authorization": f"Bearer {key}"},
